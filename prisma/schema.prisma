@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model emails {
+  id        Int      @id(map: "emails_pk") @default(autoincrement())
+  user_id   Int
+  email     String   @db.VarChar(255)
+  content   Json     @db.Json
+  post_time DateTime @default(now()) @db.Timestamptz(6)
+  users     users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "emails_fk0")
+}
+
+model get_and_post_schedules {
+  id        Int      @id(map: "get_and_post_schedules_pk") @default(autoincrement())
+  user_id   Int
+  post_url  String
+  post_time DateTime @default(now()) @db.Timestamptz(6)
+  content   Json     @db.Json
+  get_url   String
+  get_time  DateTime @default(now()) @db.Timestamptz(6)
+  users     users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "get_and_post_schedules_fk0")
+}
+
+model post_schedules {
+  id        Int      @id(map: "post_schedules_pk") @default(autoincrement())
+  user_id   Int
+  post_url  String
+  content   Json     @db.Json
+  post_time DateTime @default(now()) @db.Timestamptz(6)
+  users     users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_schedules_fk0")
+}
+
+model secure_data {
+  id          Int    @id(map: "secure_data_pk") @default(autoincrement())
+  user_id     Int
+  secret_code String @db.VarChar(255)
+  content     Json   @db.Json
+  users       users  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "secure_data_fk0")
+}
+
+model users {
+  id                     Int                      @id(map: "users_pk") @default(autoincrement())
+  name                   String                   @unique @db.VarChar(255)
+  password               String                   @db.VarChar(255)
+  type                   String                   @default("standard") @db.VarChar(255)
+  requisitions           Int                      @default(0)
+  emails                 emails[]
+  get_and_post_schedules get_and_post_schedules[]
+  post_schedules         post_schedules[]
+  secure_data            secure_data[]
+  whatsapp               whatsapp[]
+}
+
+model whatsapp {
+  id        Int      @id(map: "whatsapp_pk") @default(autoincrement())
+  user_id   Int
+  whatsapp  String   @db.VarChar(255)
+  content   Json     @db.Json
+  post_time DateTime @default(now()) @db.Timestamptz(6)
+  users     users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "whatsapp_fk0")
+}
